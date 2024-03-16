@@ -10,6 +10,7 @@
 #include <time.h>
 #include <stdint.h>
 #include <math.h>
+#include <pthread.h>
 
 #define SQUARE(x)   (x*x)
 //#define NINT(x)     ((int) x + 0.5)
@@ -31,6 +32,13 @@ typedef struct{
     int i,j;
     double delta_cost;
 } cross;
+
+#define NUM_THREADS 4
+typedef struct{
+    pthread_mutex_t mutex;
+    pthread_t thread[NUM_THREADS];
+} mt_context;
+
 
 extern void print_error(const char *err);
 extern uint64_t get_time();

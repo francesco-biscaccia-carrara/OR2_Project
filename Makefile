@@ -1,8 +1,8 @@
 output : main.o tsp.o utils.o load.o display.o algorithm.o
-	gcc main.o tsp.o utils.o load.o display.o algorithm.o -lm -o main && rm *.o
+	gcc main.o tsp.o utils.o load.o display.o algorithm.o -g -lm -o main && rm *.o
 
 test : test.o tsp.o utils.o load.o display.o algorithm.o
-	gcc test.o tsp.o utils.o load.o display.o algorithm.o -lm -o test && rm *.o
+	gcc test.o tsp.o utils.o load.o display.o algorithm.o -g -lm -o test && rm *.o
 
 test.o: test.c
 	gcc -c test.c
