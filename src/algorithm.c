@@ -72,7 +72,7 @@ void tsp_greedy(int index, instance* problem, cli_info* cli) {
     #endif
 
     if(!strncmp(cli->method,"G2OPT",5)){
-        tsp_g2opt(result,&cost,problem);
+        tsp_g2opt(result,&cost,problem,cli);
 
         #if VERBOSE > 1
         printf("Partial \e[1mG2OPT\e[m solution starting from [%i]: \t%10.4f\n", index, cost);
@@ -119,19 +119,25 @@ void* find_max(void* data){
     int start = d->k * prob->nnodes/NUM_THREADS - d->k;
     int end = ((d->k)+1)* prob->nnodes/NUM_THREADS-1;
     end = end < prob->nnodes-2 ? end : prob->nnodes-2;
+    cross best_cross = {-1,-1,INFINITY};
     for(int i=start;i<end;i++){
         for(int j=i+2;j<prob->nnodes;j++){
             if(i==0 && j+1==prob->nnodes) continue;
             double delta_cost=check_cross(prob,d->tmp_sol,i,j);
-            pthread_mutex_lock(&mt.mutex);
-            if(delta_cost < d->best_cross->delta_cost+EPSILON){
-                d->best_cross->i = i;
-                d->best_cross->j = j;
-                d->best_cross->delta_cost = delta_cost;
+            if(delta_cost < best_cross.delta_cost+EPSILON){
+                best_cross.i=i;
+                best_cross.j=j;
+                best_cross.delta_cost= delta_cost;
             }
-            pthread_mutex_unlock(&mt.mutex);
         }
     }
+    pthread_mutex_lock(&mt.mutex);
+    if(best_cross.delta_cost < d->best_cross->delta_cost+EPSILON){
+                d->best_cross->i = best_cross.i;
+                d->best_cross->j = best_cross.j;
+                d->best_cross->delta_cost = best_cross.delta_cost;
+    }
+    pthread_mutex_unlock(&mt.mutex);
     return NULL;
 }
 
@@ -144,11 +150,8 @@ cross find_best_cross_mt(int* tmp_sol,const instance* problem){
     size_t nnodes = problem->nnodes;
 
     for (int k = 0; k < NUM_THREADS; k++) {
-        data_array[k].prob = problem;
-        data_array[k].tmp_sol = tmp_sol;
-        data_array[k].best_cross = &best_cross;
-        data_array[k].k = k;
-        if(pthread_create(&mt.thread[k],NULL,find_max,(void*) &data_array[k])) exit(1);
+        mt_data data ={problem,tmp_sol,&best_cross,k};
+        if(pthread_create(&mt.thread[k],NULL,find_max,(void*) &data)) exit(1);
     }
 
     for(int k=0;k<NUM_THREADS;k++){
@@ -173,10 +176,10 @@ void check_path_cost(int* tmp_sol,double tmp_cost,instance* problem){
     }
 }
 
-void tsp_g2opt(int* tmp_sol, double* cost, instance* problem){
+void tsp_g2opt(int* tmp_sol, double* cost, instance* problem,cli_info* cli){
   char improve = 1;
   while (improve){
-    cross curr_cross = find_best_cross(tmp_sol,problem);
+    cross curr_cross = (cli->thread) ? find_best_cross_mt(tmp_sol,problem): find_best_cross(tmp_sol,problem);
     if(curr_cross.delta_cost >= EPSILON){
         improve = 0;
     }else{

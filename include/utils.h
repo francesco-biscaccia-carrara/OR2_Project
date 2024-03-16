@@ -26,6 +26,7 @@ typedef struct {
     char file_name[60];
     char method[20];
     uint64_t time_limit;
+    int thread;
 } cli_info;
 
 typedef struct{
@@ -33,7 +34,7 @@ typedef struct{
     double delta_cost;
 } cross;
 
-#define NUM_THREADS 4
+#define NUM_THREADS 16 //2 * core on my cpu
 typedef struct{
     pthread_mutex_t mutex;
     pthread_t thread[NUM_THREADS];

@@ -37,4 +37,5 @@ void print_best_solution_info(const instance* problem,const cli_info* cli){
     printf("\n\e[1mBest Solution Found\e[m (by \e[1m%s\e[m)\n",cli->method);
     printf("Starting node:\t%i\n",problem->combination[0]);
 	printf("Cost: \t%10.4f\n", problem->result);
+    if(cli->thread) printf("\e[3mMultithread used\e[m\n");
 }
