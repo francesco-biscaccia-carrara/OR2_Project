@@ -42,6 +42,12 @@ typedef struct{
     pthread_t thread[NUM_THREADS];
 } mt_context;
 
+typedef struct{
+    int num_threads;
+    pthread_mutex_t mutex;
+    pthread_t* threads;
+} dyn_mt_context;
+
 
 extern void print_error(const char *err);
 extern uint64_t get_time();
@@ -49,8 +55,8 @@ extern void help_info();
 extern int coords_to_index(uint32_t n,int i,int j);
 extern double euc_2d(point* a, point* b);
 extern void reverse(int* solution, int i, int j);
-/*
-extern void init(mt_context* ctx,int num_threads);
-extern void assign_task(mt_context* ctx,FUNCTION ,void* args);
-extern void delete(mt_context* ctx);*/
+
+extern void init_mt_context(dyn_mt_context* ctx,int num_threads);
+extern void assign_task(dyn_mt_context* ctx,int th_i,void* (*funct)(void*) ,void* args);
+extern void delete_mt_context(dyn_mt_context* ctx);
 #endif

@@ -9,6 +9,7 @@ typedef struct{
 } mt_data;
 
 mt_context mt;
+dyn_mt_context dmt;
 
 /// @brief check if the distance was computed before, if is not the case, compute and save the result
 /// @param problem istance of the problem
@@ -131,36 +132,31 @@ void* find_max(void* data){
             }
         }
     }
-    pthread_mutex_lock(&mt.mutex);
+    pthread_mutex_lock(&dmt.mutex);
     if(best_cross.delta_cost < d->best_cross->delta_cost+EPSILON){
                 d->best_cross->i = best_cross.i;
                 d->best_cross->j = best_cross.j;
                 d->best_cross->delta_cost = best_cross.delta_cost;
     }
-    pthread_mutex_unlock(&mt.mutex);
+    pthread_mutex_unlock(&dmt.mutex);
     return NULL;
 }
 
 
 cross find_best_cross_mt(int* tmp_sol,const instance* problem){
     cross best_cross = {-1,-1,INFINITY};
-    mt_data* data_array = malloc(NUM_THREADS * sizeof(mt_data));
-    pthread_mutex_init(&mt.mutex, NULL);
+    
+    init_mt_context(&dmt,24);
+    mt_data* data_array = malloc(dmt.num_threads * sizeof(mt_data));
 
-    size_t nnodes = problem->nnodes;
-
-    for (int k = 0; k < NUM_THREADS; k++) {
+    for (int k = 0; k <dmt.num_threads; k++) {
         data_array[k].prob = problem;
         data_array[k].tmp_sol = tmp_sol;
         data_array[k].best_cross = &best_cross;
         data_array[k].k=k;
-        if(pthread_create(&mt.thread[k],NULL,find_max,(void*) &data_array[k])) exit(1);
+        assign_task(&dmt,k,find_max,&data_array[k]);
     }
-
-    for(int k=0;k<NUM_THREADS;k++){
-        if(pthread_join(mt.thread[k],NULL)) exit(1);
-    }
-    pthread_mutex_destroy(&mt.mutex);
+    delete_mt_context(&dmt);
     free(data_array);
     return best_cross;
 }
