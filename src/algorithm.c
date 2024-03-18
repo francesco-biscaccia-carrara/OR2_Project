@@ -150,8 +150,11 @@ cross find_best_cross_mt(int* tmp_sol,const instance* problem){
     size_t nnodes = problem->nnodes;
 
     for (int k = 0; k < NUM_THREADS; k++) {
-        mt_data data ={problem,tmp_sol,&best_cross,k};
-        if(pthread_create(&mt.thread[k],NULL,find_max,(void*) &data)) exit(1);
+        data_array[k].prob = problem;
+        data_array[k].tmp_sol = tmp_sol;
+        data_array[k].best_cross = &best_cross;
+        data_array[k].k=k;
+        if(pthread_create(&mt.thread[k],NULL,find_max,(void*) &data_array[k])) exit(1);
     }
 
     for(int k=0;k<NUM_THREADS;k++){

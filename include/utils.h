@@ -36,7 +36,9 @@ typedef struct{
 
 #define NUM_THREADS 16 //2 * core on my cpu
 typedef struct{
+    //int num_threads;
     pthread_mutex_t mutex;
+    //pthread_t* threads;
     pthread_t thread[NUM_THREADS];
 } mt_context;
 
@@ -47,4 +49,8 @@ extern void help_info();
 extern int coords_to_index(uint32_t n,int i,int j);
 extern double euc_2d(point* a, point* b);
 extern void reverse(int* solution, int i, int j);
+/*
+extern void init(mt_context* ctx,int num_threads);
+extern void assign_task(mt_context* ctx,FUNCTION ,void* args);
+extern void delete(mt_context* ctx);*/
 #endif

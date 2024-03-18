@@ -48,4 +48,21 @@ void reverse(int* solution, int i,int j){
         i++;j--;
     }
 }
+/*
+void init(mt_context* ctx,int num_threads){
+    ctx->num_threads=num_threads;
+    ctx->threads = (pthread_t*) malloc(num_threads*sizeof(pthread_t));
+}
 
+void assign_task(mt_context* ctx,FUNCTION ,void* args){
+
+}
+
+void delete(mt_context* ctx){
+    for(int k=0;k<ctx->num_threads;k++){
+        if(pthread_join(ctx->threads[k],NULL)) exit(1);
+    }
+    free(ctx->threads);
+    free(ctx);
+}
+*/
