@@ -8,7 +8,7 @@ typedef struct{
     int k;
 } mt_data;
 
-mt_context mt;
+
 dyn_mt_context dmt;
 
 /// @brief check if the distance was computed before, if is not the case, compute and save the result
@@ -117,8 +117,8 @@ void* find_max(void* data){
     instance* prob = (instance*) d->prob;
     cross * curr_cross = (cross*) d->best_cross; 
 
-    int start = d->k * prob->nnodes/NUM_THREADS - d->k;
-    int end = ((d->k)+1)* prob->nnodes/NUM_THREADS-1;
+    int start = d->k * prob->nnodes/dmt.num_threads - d->k;
+    int end = ((d->k)+1)* prob->nnodes/dmt.num_threads-1;
     end = end < prob->nnodes-2 ? end : prob->nnodes-2;
     cross best_cross = {-1,-1,INFINITY};
     for(int i=start;i<end;i++){

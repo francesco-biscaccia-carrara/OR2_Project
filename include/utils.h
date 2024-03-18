@@ -34,6 +34,7 @@ typedef struct{
     double delta_cost;
 } cross;
 
+/*
 #define NUM_THREADS 16 //2 * core on my cpu
 typedef struct{
     //int num_threads;
@@ -41,6 +42,7 @@ typedef struct{
     //pthread_t* threads;
     pthread_t thread[NUM_THREADS];
 } mt_context;
+*/
 
 typedef struct{
     int num_threads;
